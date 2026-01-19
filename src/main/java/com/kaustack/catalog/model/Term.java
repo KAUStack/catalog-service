@@ -8,6 +8,7 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(name = "\"Term\"")
 public class Term {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -15,16 +16,22 @@ public class Term {
 
     private String name;
 
-    @Column(unique = true)
+    @Column(name = "\"termCode\"", unique = true)
     private String termCode;
 
+    @Column(name = "\"startDate\"")
     private LocalDateTime startDate;
+
+    @Column(name = "\"endDate\"")
     private LocalDateTime endDate;
 
     @OneToMany(mappedBy = "term")
     @JsonIgnoreProperties("term")
     private List<Section> sections;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    @Column(name = "\"createdAt\"")
+    private LocalDateTime createdAt;
+
+    @Column(name = "\"updatedAt\"")
+    private LocalDateTime updatedAt;
 }

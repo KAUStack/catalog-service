@@ -6,10 +6,10 @@ import lombok.Data;
 import java.util.List;
 
 @Entity
-@Table(name = "Subject", uniqueConstraints = {
+@Data
+@Table(name = "\"Course\"", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"code", "number"})
 })
-@Data
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

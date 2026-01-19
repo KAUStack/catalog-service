@@ -8,8 +8,8 @@ import java.util.List;
 
 @Entity
 @Data
-@Table(indexes = {
-        @Index(name = "idx_term_course", columnList = "termId, subjectId")
+@Table(name = "\"Section\"", indexes = {
+        @Index(name = "idx_term_course", columnList = "\"termId\", \"courseId\"")
 })
 public class Section {
     @Id
@@ -18,28 +18,30 @@ public class Section {
 
     private Integer crn;
 
-    // Prisma: termId String
     @ManyToOne
-    @JoinColumn(name = "termId")
+    @JoinColumn(name = "\"termId\"")
     @JsonIgnoreProperties("sections")
     private Term term;
 
-    // Prisma: subjectId String (Mapped to Course entity)
     @ManyToOne
-    @JoinColumn(name = "subjectId")
+    @JoinColumn(name = "\"courseId\"")
     @JsonIgnoreProperties("sections")
     private Course course;
 
-    // Prisma: instructorId String
     @ManyToOne
-    @JoinColumn(name = "instructorId")
+    @JoinColumn(name = "\"instructorId\"")
     @JsonIgnoreProperties({"sectionsTaught", "schedules"})
     private Instructor instructor;
 
     private String code;
     private String branch;
+
+    @Column(name = "\"scheduleType\"")
     private String scheduleType;
+
+    @Column(name = "\"instructionMethod\"")
     private String instructionMethod;
+
     private String level;
     private Integer credits;
 
@@ -47,6 +49,9 @@ public class Section {
     @JsonIgnoreProperties("section")
     private List<Schedule> schedules;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    @Column(name = "\"createdAt\"")
+    private LocalDateTime createdAt;
+
+    @Column(name = "\"updatedAt\"")
+    private LocalDateTime updatedAt;
 }
