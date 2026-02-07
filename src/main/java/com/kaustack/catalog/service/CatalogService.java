@@ -192,20 +192,41 @@ public class CatalogService {
         return sectionRepository.findAll(spec, pageable);
     }
 
-    public Map<String, List<String>> getGroupedSections(String termCode) {
+    public Map<String, List<String>> getGroupedSections(String termCode, String courseCode, String sectionCode, String gender) {
         Term term = resolveTerm(termCode);
 
-        // Fetch all sections for this term
         List<Section> sections = sectionRepository.findByTermId(term.getId());
 
         return sections.stream()
+                // 1. Filter by Course
+                .filter(s -> {
+                    if (courseCode == null || courseCode.isEmpty()) return true;
+                    String fullCourseName = s.getCourse().getCode() + "-" + s.getCourse().getNumber();
+                    return fullCourseName.equalsIgnoreCase(courseCode);
+                })
+                // 2. Filter by Section Code
+                .filter(s -> {
+                    if (sectionCode == null || sectionCode.isEmpty()) return true;
+                    return s.getCode().equalsIgnoreCase(sectionCode);
+                })
+                // 3. Gender/Branch Filter
+                .filter(s -> {
+                    if (gender == null || gender.isEmpty()) return true;
+                    if (s.getBranch() == null) return false;
+
+                    if (gender.equalsIgnoreCase("male")) {
+                        return s.getBranch().contains("طلاب");
+                    } else if (gender.equalsIgnoreCase("female")) {
+                        return s.getBranch().contains("طالبات");
+                    }
+                    return true;
+                })
                 .collect(Collectors.groupingBy(
                         s -> s.getCourse().getCode() + "-" + s.getCourse().getNumber(),
                         TreeMap::new,
                         Collectors.mapping(Section::getCode, Collectors.toList())
                 ));
     }
-
     public List<InstructorHierarchyDTO> getInstructorHierarchy(String termCode) {
         Term term = resolveTerm(termCode);
 

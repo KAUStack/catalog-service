@@ -7,7 +7,6 @@ import java.util.List;
 
 @Entity
 @Data
-@Table(name = "\"Instructor\"")
 public class Instructor {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
