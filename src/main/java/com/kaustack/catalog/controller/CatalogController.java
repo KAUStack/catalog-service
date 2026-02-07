@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/catalog")
+@RequestMapping("/")
 public class CatalogController {
 
     @Autowired
@@ -66,9 +66,12 @@ public class CatalogController {
 
     @GetMapping("/sections")
     public ResponseEntity<Map<String, Object>> getSections(
-            @RequestParam(required = false) String termCode
+            @RequestParam(required = false) String termCode,
+            @RequestParam(required = false) String course,
+            @RequestParam(required = false) String section,
+            @RequestParam(required = false) String gender
     ) {
-        Map<String, List<String>> groupedSections = catalogService.getGroupedSections(termCode);
+        Map<String, List<String>> groupedSections = catalogService.getGroupedSections(termCode, course, section, gender);
 
         Map<String, Object> response = new HashMap<>();
         response.put("status", "success");

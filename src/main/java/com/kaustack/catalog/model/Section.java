@@ -8,9 +8,8 @@ import java.util.List;
 
 @Entity
 @Data
-@Table(name = "\"Section\"", indexes = {
-        @Index(name = "idx_term_course", columnList = "\"termId\", \"courseId\"")
-})
+@Table(indexes = {
+        @Index(name = "idx_term_course", columnList = "term_id, course_id")})
 public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -19,27 +18,22 @@ public class Section {
     private Integer crn;
 
     @ManyToOne
-    @JoinColumn(name = "\"termId\"")
     @JsonIgnoreProperties("sections")
     private Term term;
 
     @ManyToOne
-    @JoinColumn(name = "\"courseId\"")
     @JsonIgnoreProperties("sections")
     private Course course;
 
     @ManyToOne
-    @JoinColumn(name = "\"instructorId\"")
     @JsonIgnoreProperties({"sectionsTaught", "schedules"})
     private Instructor instructor;
 
     private String code;
     private String branch;
 
-    @Column(name = "\"scheduleType\"")
     private String scheduleType;
 
-    @Column(name = "\"instructionMethod\"")
     private String instructionMethod;
 
     private String level;
@@ -49,9 +43,7 @@ public class Section {
     @JsonIgnoreProperties("section")
     private List<Schedule> schedules;
 
-    @Column(name = "\"createdAt\"")
     private LocalDateTime createdAt;
 
-    @Column(name = "\"updatedAt\"")
     private LocalDateTime updatedAt;
 }
