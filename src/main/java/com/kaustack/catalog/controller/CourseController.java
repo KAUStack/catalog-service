@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/catalog/courses")
+@RequestMapping("/courses")
 public class CourseController {
 
     @Autowired
