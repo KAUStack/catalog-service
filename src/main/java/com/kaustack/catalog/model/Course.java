@@ -7,20 +7,16 @@ import java.util.List;
 
 @Entity
 @Data
-@Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"code", "number"})
+@Table(name = "course", uniqueConstraints = {
+        @UniqueConstraint(name = "course_code_number_key", columnNames = {"code", "number"})
 })
 public class Course {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     private String title;
     private String code;
     private String number;
-
-    private String level;
-    private Integer credits;
 
     @OneToMany(mappedBy = "course")
     @JsonIgnoreProperties("course")
