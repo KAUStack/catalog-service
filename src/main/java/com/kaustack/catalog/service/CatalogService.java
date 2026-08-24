@@ -6,6 +6,7 @@ import com.kaustack.catalog.model.Section;
 import com.kaustack.catalog.model.Term;
 import com.kaustack.catalog.model.Course;
 import com.kaustack.catalog.model.Instructor;
+import com.kaustack.catalog.repository.CourseSummary;
 import com.kaustack.catalog.repository.ScheduleRepository;
 import com.kaustack.catalog.repository.SectionRepository;
 import com.kaustack.catalog.repository.TermRepository;
@@ -35,7 +36,7 @@ public class CatalogService {
 
     public List<Map<String, Object>> getCourses(String termCode, String q) {
         Term term = resolveTerm(termCode);
-        List<Course> courses = sectionRepository.findUniqueCoursesByTerm(term.getId());
+        List<CourseSummary> courses = sectionRepository.findCourseSummariesByTerm(term.getId());
 
         String normalizedQ = normalizeSearchText(q);
 
@@ -160,9 +161,9 @@ public class CatalogService {
                 predicates.add(cb.like(cb.lower(root.get("code")), "%" + sectionCode.toLowerCase() + "%"));
             }
 
-            // 6. Level Filter
+            // 6. Level Filter (section.level is a comma-joined multi-value string)
             if (level != null && !level.isEmpty()) {
-                predicates.add(cb.equal(root.get("level"), level));
+                predicates.add(cb.like(cb.lower(root.get("level")), "%" + level.toLowerCase() + "%"));
             }
 
             // 7. Gender/Branch Filter
@@ -209,8 +210,13 @@ public class CatalogService {
                     }
                 }
 
-                scheduleSubquery.where(cb.and(subPredicates.toArray(new Predicate[0])));
-                predicates.add(cb.exists(scheduleSubquery));
+                // Only constrain on schedules if a day/time predicate actually parsed.
+                // Otherwise the bare EXISTS would silently drop sections that have
+                // no schedule rows at all.
+                if (subPredicates.size() > 1) {
+                    scheduleSubquery.where(cb.and(subPredicates.toArray(new Predicate[0])));
+                    predicates.add(cb.exists(scheduleSubquery));
+                }
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
@@ -238,7 +244,8 @@ public class CatalogService {
                         String target = (s.getCourse().getCode() + s.getCourse().getNumber()).toLowerCase();
                         if (!target.contains(normalizedQ)) return false;
                     }
-                    if (sectionCode != null && !s.getCode().contains(sectionCode)) return false;
+
+                    if (sectionCode != null && (s.getCode() == null || !s.getCode().contains(sectionCode))) return false;
                     if (gender != null) {
                         String mapped = mapGender(gender);
                         return s.getBranch() != null && s.getBranch().contains(Objects.requireNonNull(mapped));
@@ -272,8 +279,22 @@ public class CatalogService {
     }
 
     public Course getCourseById(String courseId) {
-        return (Course) sectionRepository.findCourseById(courseId)
+        return sectionRepository.findCourseById(courseId)
                 .orElseThrow(() -> new IllegalArgumentException("Course not found with ID: " + courseId));
+    }
+
+    public Map<String, Object> getCourseDetails(String courseId) {
+        Course course = getCourseById(courseId);
+
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("id", course.getId());
+        data.put("code", course.getCode());
+        data.put("number", course.getNumber());
+        data.put("title", course.getTitle());
+        data.put("fullCode", course.getCode() + "-" + course.getNumber());
+        // credits live on section in the KIndex schema
+        data.put("credits", sectionRepository.findCreditsByCourseId(courseId).orElse(null));
+        return data;
     }
 
     public Map<String, Object> getInstructorDetails(String instructorId, String termCode) {

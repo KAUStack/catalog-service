@@ -1,7 +1,6 @@
 package com.kaustack.catalog.controller;
 
 import com.kaustack.catalog.dto.SectionDTO;
-import com.kaustack.catalog.model.Course;
 import com.kaustack.catalog.model.Section;
 import com.kaustack.catalog.service.CatalogMapper;
 import com.kaustack.catalog.service.CatalogService;
@@ -9,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,14 +39,7 @@ public class CourseController {
     @GetMapping("/{courseId}")
     public ResponseEntity<Map<String, Object>> getCourseById(@PathVariable String courseId) {
         try {
-            Course course = catalogService.getCourseById(courseId);
-
-            Map<String, Object> courseData = new LinkedHashMap<>();
-            courseData.put("id", course.getId());
-            courseData.put("code", course.getCode());
-            courseData.put("number", course.getNumber());
-            courseData.put("title", course.getTitle());
-            courseData.put("credits", course.getCredits());
+            Map<String, Object> courseData = catalogService.getCourseDetails(courseId);
 
             return ResponseEntity.ok(Map.of(
                     "status", "success",

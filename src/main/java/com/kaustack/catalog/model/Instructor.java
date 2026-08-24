@@ -7,12 +7,14 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(name = "instructor")
 public class Instructor {
     @Id
     private String id;
 
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String name;
+
     private String email;
 
     @OneToMany(mappedBy = "instructor")
