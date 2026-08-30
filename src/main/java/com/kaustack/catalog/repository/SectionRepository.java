@@ -39,6 +39,6 @@ public interface SectionRepository extends JpaRepository<Section, String>, JpaSp
     @Query("SELECT MAX(s.credits) FROM Section s WHERE s.course.id = :courseId")
     Optional<Integer> findCreditsByCourseId(@Param("courseId") String courseId);
 
-    @EntityGraph(attributePaths = {"course", "term", "instructor"})
+    @EntityGraph(attributePaths = {"course", "term", "instructor", "schedules", "schedules.instructor"})
     List<Section> findByTermIdAndCourseId(String termId, String courseId);
 }
