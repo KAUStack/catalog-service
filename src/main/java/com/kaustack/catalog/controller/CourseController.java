@@ -11,8 +11,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
+
 @RestController
 @RequestMapping("/courses")
+@RegisterReflectionForBinding({SectionDTO.class, SectionDTO.ScheduleDTO.class})
 public class CourseController {
 
     @Autowired
